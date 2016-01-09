@@ -1,19 +1,17 @@
 package com.csec.vizyon;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -56,6 +54,48 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
 
+        checkIfPermissonExists();
+    }
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    private void checkIfPermissonExists() {
+        int hasWriteContactsPermission = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+
+            hasWriteContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+            else {
+                readContacts();
+            }
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readContacts();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "WRITE_CONTACTS Denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    public void readContacts(){
+
+        ContentResolver contentResolver = getContentResolver();
+        Contacts contacts= new Contacts(contentResolver);
+        contacts.getAllContacts();
     }
 
     //getting sinemalar content
