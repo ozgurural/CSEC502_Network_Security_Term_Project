@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -53,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
 //        Log.i(TAG_MAIN, sinemalarContent.toString());
 
         context = this;
+        //checkIfPermissonExists();
 
-        checkIfPermissonExists();
+//        Utils utils = new Utils(context);
+//        Log.i("XXXXXXXX", utils.get_IMEI());
+//        new Tickets().getTickets(context);
+
     }
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
