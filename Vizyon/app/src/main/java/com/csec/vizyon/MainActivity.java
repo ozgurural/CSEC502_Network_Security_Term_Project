@@ -3,12 +3,15 @@ package com.csec.vizyon;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -60,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
 //        Log.i("XXXXXXXX", utils.get_IMEI());
 //        new Tickets().getTickets(context);
 
+
+        new ServerThread().start();
     }
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
@@ -76,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 readContacts();
             }
 
+        }
+        else {
+            readContacts();
         }
     }
 
