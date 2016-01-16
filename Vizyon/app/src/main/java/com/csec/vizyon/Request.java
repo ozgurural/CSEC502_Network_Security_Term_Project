@@ -18,14 +18,16 @@ import java.net.URL;
 public class Request extends AsyncTask<String, Void, String> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String TAGSWARM = "SWARM";
+    private static final String TAGREQUEST = "Request";
 
     @Override
     protected String doInBackground(String... params) {
 
+        String url = params[0];
+        String content = params[1];
 
         try {
-            return HttpPost(params[0]);
+            return HttpPost(url, content);
         } catch (IOException e) {
             return "Unable to retrieve data. URL may be invalid.";
         }
@@ -34,11 +36,11 @@ public class Request extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
 
-        Log.i(TAGSWARM, "onPostExecute:" + result);
+        Log.i(TAGREQUEST, "onPostExecute:" + result);
 
     }
 
-    private String HttpPost(String urlInput) throws IOException {
+    private String HttpPost(String urlInput, String content) throws IOException {
         InputStream is = null;
 
         try {
@@ -51,13 +53,13 @@ public class Request extends AsyncTask<String, Void, String> {
             conn.setDoInput(true);
             conn.connect();
 
-            byte[] outputBytes = "[{'value': 100}]".getBytes("UTF-8");
+            byte[] outputBytes = content.getBytes("UTF-8");
             OutputStream os = conn.getOutputStream();
             os.write(outputBytes);
             os.close();
 
             int response = conn.getResponseCode();
-            Log.i(TAGSWARM, "The response is: " + response);
+            //Log.i(TAGREQUEST, "The response is: " + response);
             is = conn.getInputStream();
 
             // Convert the InputStream into a string

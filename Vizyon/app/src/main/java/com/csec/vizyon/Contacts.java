@@ -46,8 +46,6 @@ public class Contacts extends Activity {
         String DATA = ContactsContract.CommonDataKinds.Email.DATA;
 
         Cursor cursor = contentResolver.query(CONTENT_URI, null,null, null, null);
-
-
         try {
             // Loop for every contact in the phone
             if (cursor.getCount() > 0) {
@@ -81,15 +79,14 @@ public class Contacts extends Activity {
                             person.put("email", email);
                         }
                         emailCursor.close();
+                        contactList.put(person);
                     }
-                    contactList.put(person);
                 }
-                Log.i(TAG_CONTACTS, contactList.toString());
+                //Log.i(TAG_CONTACTS, contactList.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return contactList;
     }
 }

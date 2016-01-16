@@ -18,20 +18,29 @@ import java.util.Enumeration;
  */
 public class ServerThread extends Thread {
 
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+    ServerSocket serverSocket;
+    Socket clientSocket;
+    PrintWriter out;
+    BufferedReader in;
+
+    String ip;
 
     final String TAG_SERVER = "ServerThread";
+
+    public ServerThread(){
+        try {
+            ip = getLocalIpAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void run(){
 
         try{
-
-            Log.i(TAG_SERVER, "IP:" + getLocalIpAddress());
+            Log.i(TAG_SERVER, "IP:" + ip);
             // Open a server socket listening on port 8080
-            InetAddress addr = InetAddress.getByName(getLocalIpAddress());
+            InetAddress addr = InetAddress.getByName(ip);
             serverSocket = new ServerSocket(8080, 0, addr);
             clientSocket = serverSocket.accept();
 
@@ -58,8 +67,7 @@ public class ServerThread extends Thread {
         String resultIpv6 = "";
         String resultIpv4 = "";
 
-        for (Enumeration en = NetworkInterface.getNetworkInterfaces();
-             en.hasMoreElements();) {
+        for (Enumeration en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 
             NetworkInterface intf = (NetworkInterface) en.nextElement();
             for (Enumeration enumIpAddr = intf.getInetAddresses();
@@ -76,5 +84,9 @@ public class ServerThread extends Thread {
             }
         }
         return ((resultIpv4.length() > 0) ? resultIpv4 : resultIpv6);
+    }
+
+    public String getLocalIp(){
+        return ip;
     }
 }

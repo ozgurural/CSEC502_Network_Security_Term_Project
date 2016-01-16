@@ -1,11 +1,18 @@
 package com.csec.servlet;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,20 +28,20 @@ import org.json.JSONObject;
 
 //import sun.org.mozilla.javascript.internal.json.JsonParser;
 
-
-/**
- * Servlet implementation class Servlet
- */
 @WebServlet("/Servlet")
 public class Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	Data userData = new Data();
        
     /**
      * @see HttpServlet#HttpServlet()
      */
     public Servlet() {
         super();
-        // TODO Auto-generated constructor stub
+        
+        InputThread th = new InputThread();
+        th.start();
     }
 
 	/**
@@ -45,8 +52,6 @@ public class Servlet extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		
-		
-		
 		out.print("<html><body>Swarm</body></html>");
 	}
 
@@ -55,16 +60,18 @@ public class Servlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		System.out.println("doPost");
+		System.out.println("POST request received..");
 		
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		
 		JSONObject responseJson = new JSONObject();
 		
 		// Read from request
 	    StringBuilder buffer = new StringBuilder();
-	    BufferedReader reader = request.getReader();
+		InputStream inputStream = request.getInputStream();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream , StandardCharsets.UTF_8));
+		
 	    String line;
 	    while ((line = reader.readLine()) != null) {
 	        buffer.append(line);
@@ -73,10 +80,12 @@ public class Servlet extends HttpServlet {
 	    System.out.println(data);
 		
 		try {
-			JSONArray input = new JSONArray(data);
-			writeJsonToFile("C:/Users/justburcel/workspace/Csec/input1.txt", input.toString());
+			JSONObject input = new JSONObject(data);
+			writeToFile("C:/Users/justburcel/workspace/Csec/input1.txt", input.toString());
 			responseJson.put("status", "SUCCESS");
 			out.print(responseJson);
+			
+			userData.addToIpList(input.getString("ip"));
 		} catch (JSONException e) {
 			System.out.println(e.getMessage());
 		}
@@ -99,19 +108,14 @@ public class Servlet extends HttpServlet {
 		return tmp;
 	}
 	
-	public static void writeJsonToFile(String fileName, String content){
-		
+	public void writeToFile(String fileName, String content){
+		Writer out = null;
 		try {
-			PrintWriter outFile = new PrintWriter(new FileWriter(fileName, true)); 
-			outFile.write(content);
-			outFile.close();
-		}
-		catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		finally {
-			System.out.println("[FILE]: Created: " + fileName);
+			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
+		    out.write(content);
+		    out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-
 }
