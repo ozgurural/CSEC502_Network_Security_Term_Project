@@ -14,15 +14,32 @@ import java.util.List;
 
 public class Data {
 	
-	static String FILESEPARATOR = File.pathSeparator;
+	static String FILESEPARATOR = File.separator;
 	static List<String> ipList = new ArrayList<String>();
 	
+	String dataRootFileLocation = "Data";
+	String ipAddressesFileLocation = dataRootFileLocation + FILESEPARATOR + "IP.txt";
+	
 	public Data(){
-		
+		createDirectory(dataRootFileLocation);
 	}
 	
 	public void addToIpList(String ip){
+		
+		//ip already exists
+		if(ipList.contains(ip)){
+			return;
+		}
+		
+		//add ip
 		ipList.add(ip);
+		
+		//Save ips to file
+		StringBuilder sb = new StringBuilder();
+		for(String item : ipList){
+			sb.append(item + "\n");
+		}
+		writeToFile(ipAddressesFileLocation, sb.toString());
 	}
 	
 	public List<String> getIpList(){
@@ -43,6 +60,30 @@ public class Data {
 			e.printStackTrace();
 		}
 		return returnBool;
+	}
+	
+	public boolean readIpAddresses(){
+		BufferedReader br;
+		try{
+			//check if ip addresses file exists
+			File ipFile = new File(ipAddressesFileLocation);
+			if(!ipFile.exists()) { 
+			    return false;
+			}
+			
+			br = new BufferedReader(new FileReader(ipAddressesFileLocation));
+			StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+		    while (line != null) {
+		    	ipList.add(line);
+		        line = br.readLine();
+		    }
+		    br.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return true;
 	}
 	
 	public String readFile(String fileName){
