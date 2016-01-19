@@ -61,10 +61,8 @@ public class MainActivity extends AppCompatActivity {
         new SinemalarRequest().execute(SINEMALAR_URL);
         //Log.i(TAG_MAIN, sinemalarContent.toString());
 
-        //initiate server
-        ServerThread serverThread = new ServerThread();
-        String ip = serverThread.getLocalIp();
-        new ServerThread().start();
+        Server server = new Server();
+        String ip = server.getIpAddress();
 
         context = this;
         checkIfPermissonExists();

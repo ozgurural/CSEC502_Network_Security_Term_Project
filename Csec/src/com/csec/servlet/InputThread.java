@@ -3,14 +3,22 @@ package com.csec.servlet;
 import java.util.List;
 import java.util.Scanner;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class InputThread extends Thread {
 	Scanner scanner;
 	String command;
 	String commandOutputParser = "> ";
 	
+	//commands
 	String getAllIpAddresses = "ip";
-	List<String> ipList;
+	String getUtils = "util";
+	String sendCommand = "send";
 	
+	
+	List<String> ipList;
+	String sendCommandPort = ":8080";
 	Data userData;
 	
 	public InputThread(){
@@ -30,9 +38,7 @@ public class InputThread extends Thread {
 			
 			command = scanner.next();
 			
-			String commandType = command.split(" ")[0];
-			
-			if(commandType.equals(getAllIpAddresses)){
+			if(command.equals(getAllIpAddresses)){
 				if(ipList.size() == 0){
 					System.out.println(commandOutputParser + "No active IP is found.");
 				}
@@ -42,9 +48,29 @@ public class InputThread extends Thread {
 					}
 				}
 			}
+			else if(command.equals(getUtils)){
+				command = scanner.next();
+				JSONObject allUtils = userData.getUtils(command);
+				
+				System.out.println(commandOutputParser + "Printing all utils info for IP: " + command);
+				try {
+					System.out.println(allUtils.toString(4));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} 
+			}
+			else if(command.equals(sendCommand)){
+				String sendIp =  scanner.next();
+				String message =  scanner.next();
+				
+				ClientSocket clientSocket = new ClientSocket();
+				clientSocket.sendToSocket(sendIp, message);
+			}
 			else {
 				// Help command
-				System.out.println(commandOutputParser + "Get All IP Addresses: " + getAllIpAddresses);
+				System.out.println(commandOutputParser + "Get all IP addresses: " + getAllIpAddresses);
+				System.out.println(commandOutputParser + "Get util info about ip: " + getUtils + " <IP>");
+				System.out.println(commandOutputParser + "Send command to ip: " + sendCommand + " <IP>");
 			}
 		}
 	}

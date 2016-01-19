@@ -77,42 +77,28 @@ public class Servlet extends HttpServlet {
 		
 		try {
 			JSONObject input = new JSONObject(data);
-			writeToFile("C:/Users/justburcel/workspace/Csec/input1.txt", input.toString());
-			responseJson.put("status", "SUCCESS");
-			out.print(responseJson);
+			//writeToFile("C:/Users/justburcel/workspace/Csec/input1.txt", input.toString());
+			
+			String ip = "";
+			if(input.has("ip")){
+				ip = input.getString("ip");
+			}
+			else {
+				ip = "UNKNOWNIP";
+			}
+			
+			userData.saveInput(ip, input);
 			
 			//save ip address
 			userData.addToIpList(input.getString("ip"));
+			
+			//send success
+			responseJson.put("status", "SUCCESS");
+			out.print(responseJson);
 		} catch (JSONException e) {
 			System.out.println(e.getMessage());
 		}
 		
 	}
 	
-	public static JSONArray readFromFile(String fileName){
-		
-		JSONArray tmp = new JSONArray();
-		try {
-	    	BufferedReader br = new BufferedReader(new FileReader(fileName));
-	        String line = br.readLine();
-
-	        tmp = new JSONArray(line);
-	        
-	        br.close();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		return tmp;
-	}
-	
-	public void writeToFile(String fileName, String content){
-		Writer out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
-		    out.write(content);
-		    out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

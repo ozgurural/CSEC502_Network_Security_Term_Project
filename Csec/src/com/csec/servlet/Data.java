@@ -9,8 +9,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Data {
 	
@@ -19,9 +26,13 @@ public class Data {
 	
 	String dataRootFileLocation = "Data";
 	String ipAddressesFileLocation = dataRootFileLocation + FILESEPARATOR + "IP.txt";
+	String inputRootFileLocation = dataRootFileLocation + FILESEPARATOR + "input";
+	
+	String jsonUtilsTag = "utils";
 	
 	public Data(){
 		createDirectory(dataRootFileLocation);
+		createDirectory(inputRootFileLocation);
 	}
 	
 	public void addToIpList(String ip){
@@ -44,6 +55,49 @@ public class Data {
 	
 	public List<String> getIpList(){
 		return ipList;
+	}
+	
+	public void saveInput(String ip, JSONObject content){
+		DateFormat dateFormat = new SimpleDateFormat("---yyyy-MM-dd--HH-mm-ss");
+		String currDate = dateFormat.format(new Date());
+		String inputFileLocation = inputRootFileLocation + FILESEPARATOR + ip + currDate + ".txt";
+		
+		writeToFile(inputFileLocation, content.toString());
+		
+	}
+	
+	public JSONObject getUtils(String ip){
+		JSONObject returnJson = new JSONObject();
+		
+		File inputDir = new File(inputRootFileLocation);
+		for(File file : inputDir.listFiles()) {
+		    if(file.getName().startsWith(ip)){
+		    	String filePath = file.getAbsolutePath();
+		    	String fileInput = readFile(filePath);
+		    	String fileTime = getTimeFromFileName(filePath);
+		    	
+		    	try {
+		    		JSONObject fileInputJson = new JSONObject(fileInput);
+		    		if(fileInputJson.has(jsonUtilsTag)){
+		    			
+		    			returnJson.put(fileTime, fileInputJson.get(jsonUtilsTag));
+		    		}
+		    	} catch (JSONException e) {
+					System.out.println(e.getMessage());
+				}
+		    }
+		}
+		return returnJson;
+	}
+	
+	public String getTimeFromFileName(String fileName){
+		String[] fileNameSplitted = fileName.split("---");
+		if(fileNameSplitted.length > 1){
+			return fileNameSplitted[1];
+		}
+		else {
+			return "TIMEUNKNOWN";
+		}
 	}
 
 	//return true if directory is created, false otherwise
