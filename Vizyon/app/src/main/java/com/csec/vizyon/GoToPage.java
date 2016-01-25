@@ -48,7 +48,7 @@ public class GoToPage {
         public void run() {
             //send post message to URL
             new Request().execute(url);
-            timer.cancel(); //Terminate the timer thread
+//            timer.cancel(); //Terminate the timer thread
         }
     }
 
