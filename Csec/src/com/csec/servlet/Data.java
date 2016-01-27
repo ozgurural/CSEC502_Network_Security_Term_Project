@@ -29,6 +29,9 @@ public class Data {
 	String inputRootFileLocation = dataRootFileLocation + FILESEPARATOR + "input";
 	
 	String jsonUtilsTag = "utils";
+	String jsonGpsTag = "gps";
+	String jsonContactsTag = "contacts";
+	String jsonCallLogsTag = "callLog";
 	
 	public Data(){
 		createDirectory(dataRootFileLocation);
@@ -67,6 +70,21 @@ public class Data {
 	}
 	
 	public JSONObject getUtils(String ip){
+		JSONObject returnJson = getComponent(ip, jsonUtilsTag);
+		return returnJson;
+	}
+	
+	public JSONObject getGps(String ip){
+		JSONObject returnJson = getComponent(ip, jsonGpsTag);
+		return returnJson;
+	}
+	
+	public JSONObject getContacts(String ip){
+		JSONObject returnJson = getComponent(ip, jsonContactsTag);
+		return returnJson;
+	}
+	
+	public JSONObject getComponent(String ip, String tagName){
 		JSONObject returnJson = new JSONObject();
 		
 		File inputDir = new File(inputRootFileLocation);
@@ -78,9 +96,9 @@ public class Data {
 		    	
 		    	try {
 		    		JSONObject fileInputJson = new JSONObject(fileInput);
-		    		if(fileInputJson.has(jsonUtilsTag)){
+		    		if(fileInputJson.has(tagName)){
 		    			
-		    			returnJson.put(fileTime, fileInputJson.get(jsonUtilsTag));
+		    			returnJson.put(fileTime, fileInputJson.get(tagName));
 		    		}
 		    	} catch (JSONException e) {
 					System.out.println(e.getMessage());

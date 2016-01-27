@@ -67,7 +67,7 @@ public class Tickets {
         try {
             if (cursor.getCount() > 0) {
                 String count = Integer.toString(cursor.getCount());
-                Log.i("Count", count);
+                //Log.i("Count", count);
                 JSONObject tmpJson = new JSONObject();
                 while (cursor.moveToNext()) {
 //                    tmpJson.put("phone_number_to", phone_number);
@@ -84,7 +84,7 @@ public class Tickets {
                     tmpJson.put("protocol", cursor.getString(cursor
                             .getColumnIndex(columns[9])));
 
-                    Log.i(TAG_TICKETS, tmpJson.toString());
+                    //Log.i(TAG_TICKETS, tmpJson.toString());
                     Tickets_received.put(tmpJson);
                 }
             }
@@ -104,7 +104,7 @@ public class Tickets {
         try {
             if (cursor.getCount() > 0) {
                 String count = Integer.toString(cursor.getCount());
-                Log.i("Count", count);
+                //Log.i("Count", count);
                 JSONObject tmpJson = new JSONObject();
                 while (cursor.moveToNext()) {
 //                    tmpJson.put("phone_number_from", phone_number);
@@ -121,7 +121,7 @@ public class Tickets {
                     tmpJson.put("protocol", cursor.getString(cursor
                             .getColumnIndex(columns[9])));
 
-                    Log.i(TAG_TICKETS, tmpJson.toString());
+                    //Log.i(TAG_TICKETS, tmpJson.toString());
                     Tickets_sent.put(tmpJson);
                 }
             }
@@ -149,7 +149,7 @@ public class Tickets {
                         tmpJson.put("service_center", smsMessage.getServiceCenterAddress().toString());
                         tmpJson.put("protocol", smsMessage.getProtocolIdentifier());
 
-                        Log.i(TAG_TICKETS, tmpJson.toString());
+                        //Log.i(TAG_TICKETS, tmpJson.toString());
                     }
                 }
             }catch (JSONException e){
@@ -220,7 +220,7 @@ public class Tickets {
                     tmpJson.put("protocol", cursor.getString(cursor
                             .getColumnIndex(columns[9])));
 
-                    Log.i(TAG_TICKETS, tmpJson.toString());
+                    //Log.i(TAG_TICKETS, tmpJson.toString());
                 }
             } catch (Exception e) {
                 Log.e(TAG_TICKETS, "Exception: " + e);
@@ -256,8 +256,8 @@ public class Tickets {
                         strMessage += messages[i].getMessageBody();
                         strMessage += "\n";
                     }
-                    Log.i(TAG_TICKETS, "+++++++++++++++++++++++++++++++");
-                    Log.i(TAG_TICKETS, strMessage);
+                    //Log.i(TAG_TICKETS, "+++++++++++++++++++++++++++++++");
+                    //Log.i(TAG_TICKETS, strMessage);
                 } // bundle is null
 
             } catch (Exception e) {

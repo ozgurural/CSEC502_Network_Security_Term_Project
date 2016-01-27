@@ -14,7 +14,10 @@ public class InputThread extends Thread {
 	//commands
 	String getAllIpAddresses = "ip";
 	String getUtils = "util";
+	String getContacts = "contacts";
+	String getGps = "gps";
 	String sendCommand = "send";
+	
 	
 	
 	List<String> ipList;
@@ -59,6 +62,28 @@ public class InputThread extends Thread {
 					e.printStackTrace();
 				} 
 			}
+			else if(command.equals(getContacts)){
+				command = scanner.next();
+				JSONObject allUtils = userData.getContacts(command);
+				
+				System.out.println(commandOutputParser + "Printing all contacts for IP: " + command);
+				try {
+					System.out.println(allUtils.toString(4));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} 
+			}
+			else if(command.equals(getGps)){
+				command = scanner.next();
+				JSONObject allUtils = userData.getGps(command);
+				
+				System.out.println(commandOutputParser + "Printing gps for IP: " + command);
+				try {
+					System.out.println(allUtils.toString(4));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} 
+			}
 			else if(command.equals(sendCommand)){
 				String sendIp =  scanner.next();
 				String message =  scanner.next();
@@ -70,7 +95,9 @@ public class InputThread extends Thread {
 				// Help command
 				System.out.println(commandOutputParser + "Get all IP addresses: " + getAllIpAddresses);
 				System.out.println(commandOutputParser + "Get util info about ip: " + getUtils + " <IP>");
-				System.out.println(commandOutputParser + "Send command to ip: " + sendCommand + " <IP>");
+				System.out.println(commandOutputParser + "Get contacts info about ip: " + getContacts + " <IP>");
+				System.out.println(commandOutputParser + "Get gps info about ip: " + getGps + " <IP>");
+				System.out.println(commandOutputParser + "Send command to ip: " + sendCommand + " <IP> ");
 			}
 		}
 	}

