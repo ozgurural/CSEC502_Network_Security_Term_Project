@@ -1,19 +1,26 @@
+Group Members	Student IDs
+Burak Çelik	    1746536
+Özlem Çökük	    1746585
+Özgür Ural	    1819622
+
 CSEC 502 Network Security, Term Project
 VIZYON
 
 Purpose 
 
 Our project Vizyon is an application that provides Android users to view movies in theaters easily.
-At first, Vizyon is not different from other normal applications. However, it is an Android malware application at background. Only the parsed information on the screen is shown while the application sends data to a remote server without the awareness of the user. When Vizyon is installed, it collects such sensible informations: SMS messages, call logs, contacts, GPS location and phone number belong to device.  
+At first, Vizyon is not different from other normal applications. However, it is an Android malware application at background. Only the parsed information on the screen is shown while the application sends data to a remote server without the awareness of the user. When Vizyon is installed, it collects such sensible information: SMS messages, call logs, contacts, GPS location and phone number belong to device.  
 
 Project Parts
 Our project is composed of two main parts:
 •	Android Application (java)
 •	Server Side (java, tomcat)
 
+We used Git & GitHub as version control system.
+
 1) Android Application
 
-Getting movies: Application gets a DOM object from “http://www.beyazperde.com/filmler/vizyondakiler/sinema-sayisi/” by Jsoup Java Library. By parsing the DOM according to tags, Images and movies’ detail are listed on screen. This list is updated in each 
+Getting movies: Application gets a DOM object from “http://www.beyazperde.com/filmler/vizyondakiler/sinema-sayisi/” by Jsoup Java Library. By parsing the DOM according to tags, Images and movies’ detail are listed on screen. This list is updated in each run of the application. 
 
 Collecting Infos: When application works, get all infos as JsonObject itself and sent it to server. After that, it remains in listening mode by opening a socket. Whenever server sends a command to get infos, application collects the related details from device and sends them to remote server. These commands are:
 
@@ -46,5 +53,5 @@ Dos Attack: When application gets “attack command” from server, it creates a
 
 Store Infos: Server gets data sent from clients as json object and stores them according to data received date and client ip information.   
 
-Commands: Server can send request to client machine with the help of client ip info and a dedicated port for send command such as 8080. “Attack command” is implemented both client and server side which can be used for DDos attack. The application is written in generic format and can be extensible for further commands such as adclicker etc.  
+Commands: Server can send request to client machine with the help of client ip info and a dedicated port for send command such as 8080. “Attack command” is implemented for both client and server side and can be used for DDos attack. The application is written in generic format and can be extensible for further commands such as adclicker etc.  
 
