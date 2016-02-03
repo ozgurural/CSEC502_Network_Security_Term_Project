@@ -6,6 +6,9 @@ Burak Çelik	    1746536
 CSEC 502 Network Security, Term Project
 VIZYON
 
+Demo video link:
+https://drive.google.com/file/d/0B44MIAZL3OmfbmlfSlBES0s1T00/view
+
 Purpose 
 
 Our project Vizyon is an application that provides Android users to view movies in theaters easily.
