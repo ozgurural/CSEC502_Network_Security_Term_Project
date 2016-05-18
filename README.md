@@ -1,8 +1,3 @@
-Group Members	Student IDs
-Burak Çelik	    1746536
-Özlem Çökük	    1746585
-Özgür Ural	    1819622
-
 CSEC 502 Network Security, Term Project
 VIZYON
 
